@@ -19,11 +19,20 @@ const products = productsFromServer.map(product => {
 
 export const App = () => {
   const [query, setQuery] = useState('');
+  const [categorySelected, setcategorySelected] = useState(0);
+
   let visibleProducts = [...products];
+
+  if (categorySelected) {
+    visibleProducts = visibleProducts.filter(product => {
+      return product.categoryId === categorySelected;
+    });
+  }
 
   if (query) {
     visibleProducts = visibleProducts.filter(product => {
       const normilizedQuery = query.toLowerCase().trim();
+
       return product.name.toLowerCase().includes(normilizedQuery);
     });
   }
@@ -87,19 +96,28 @@ export const App = () => {
                 href="#/"
                 data-cy="AllCategories"
                 className="button is-success mr-6 is-outlined"
+                onClick={() => setcategorySelected(0)}
               >
                 All
               </a>
 
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
+              {products.map(product => {
+                <a
+                  data-cy="Category"
+                  className="button mr-2 my-1 is-info"
+                  href="#/"
+                  onClick={() => setcategorySelected(product.categoryId)}
+                >
+                  Category {product.categoryId}
+                </a>;
+              })}
 
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
+              {/* <a
+                data-cy="Category"
+                className="button mr-2 my-1"
+                href="#/"
+                onClick={() => setcategorySelected(2)}
+              >
                 Category 2
               </a>
 
@@ -107,12 +125,18 @@ export const App = () => {
                 data-cy="Category"
                 className="button mr-2 my-1 is-info"
                 href="#/"
+                onClick={() => setcategorySelected(3)}
               >
                 Category 3
               </a>
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
+              <a
+                data-cy="Category"
+                className="button mr-2 my-1"
+                href="#/"
+                onClick={() => setcategorySelected(4)}
+              >
                 Category 4
-              </a>
+              </a> */}
             </div>
 
             <div className="panel-block">
@@ -128,83 +152,85 @@ export const App = () => {
         </div>
 
         <div className="box table-container">
-          <p data-cy="NoMatchingMessage">
-            No products matching selected criteria
-          </p>
+          {visibleProducts.length <= 0 ? (
+            <p data-cy="NoMatchingMessage">
+              No products matching selected criteria
+            </p>
+          ) : (
+            <table
+              data-cy="ProductTable"
+              className="table is-striped is-narrow is-fullwidth"
+            >
+              <thead>
+                <tr>
+                  <th>
+                    <span className="is-flex is-flex-wrap-nowrap">
+                      ID
+                      <a href="#/">
+                        <span className="icon">
+                          <i data-cy="SortIcon" className="fas fa-sort" />
+                        </span>
+                      </a>
+                    </span>
+                  </th>
 
-          <table
-            data-cy="ProductTable"
-            className="table is-striped is-narrow is-fullwidth"
-          >
-            <thead>
-              <tr>
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    ID
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
+                  <th>
+                    <span className="is-flex is-flex-wrap-nowrap">
+                      Product
+                      <a href="#/">
+                        <span className="icon">
+                          <i data-cy="SortIcon" className="fas fa-sort-down" />
+                        </span>
+                      </a>
+                    </span>
+                  </th>
 
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    Product
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort-down" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
+                  <th>
+                    <span className="is-flex is-flex-wrap-nowrap">
+                      Category
+                      <a href="#/">
+                        <span className="icon">
+                          <i data-cy="SortIcon" className="fas fa-sort-up" />
+                        </span>
+                      </a>
+                    </span>
+                  </th>
 
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    Category
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort-up" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
+                  <th>
+                    <span className="is-flex is-flex-wrap-nowrap">
+                      User
+                      <a href="#/">
+                        <span className="icon">
+                          <i data-cy="SortIcon" className="fas fa-sort" />
+                        </span>
+                      </a>
+                    </span>
+                  </th>
+                </tr>
+              </thead>
 
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    User
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
-              </tr>
-            </thead>
+              <tbody>
+                {visibleProducts.map(product => {
+                  return (
+                    <tr data-cy="Product" key={product.id}>
+                      <td className="has-text-weight-bold" data-cy="ProductId">
+                        {product.id}
+                      </td>
 
-            <tbody>
-              {visibleProducts.map(product => {
-                return (
-                  <tr data-cy="Product" key={product.id}>
-                    <td className="has-text-weight-bold" data-cy="ProductId">
-                      {product.id}
-                    </td>
+                      <td data-cy="ProductName">{product.name}</td>
+                      <td data-cy="ProductCategory">
+                        {`${product.category.icon} - ${product.category.title}`}
+                      </td>
 
-                    <td data-cy="ProductName">{product.name}</td>
-                    <td data-cy="ProductCategory">
-                      {`${product.category.icon} - ${product.category.title}`}
-                    </td>
-
-                    <td data-cy="ProductUser" className="has-text-link">
-                      {product.user.name}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      <td data-cy="ProductUser" className="has-text-link">
+                        {product.user.name}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
