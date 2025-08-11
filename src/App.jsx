@@ -45,13 +45,12 @@ export const App = () => {
     });
   }
 
-  let categoryNames = [];
+  const categoryNames = [];
+
   products.forEach(product => {
     if (!categoryNames.includes(product.categoryId))
-      return categoryNames.push(product.categoryId);
+      categoryNames.push(product.categoryId);
   });
-
-  console.log(categoryNames);
 
   return (
     <div className="section">
