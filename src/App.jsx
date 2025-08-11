@@ -70,15 +70,18 @@ export const App = () => {
                 All
               </a>
 
-              {usersFromServer.map(user => {
+              {usersFromServer.map(product => {
                 return (
                   <a
+                    key={product.id}
                     data-cy="FilterUser"
                     href="#/"
-                    onClick={() => setSelectedUserId(user.id)}
-                    className={cn({ 'is-active': user.id === selectedUserId })}
+                    onClick={() => setSelectedUserId(product.id)}
+                    className={cn({
+                      'is-active': product.id === selectedUserId,
+                    })}
                   >
-                    {user.name}
+                    {product.name}
                   </a>
                 );
               })}
