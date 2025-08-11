@@ -8,14 +8,25 @@ import productsFromServer from './api/products';
 
 const products = productsFromServer.map(product => {
   const category = categoriesFromServer.find(
-    category => product.categoryId === category.id,
+    categoryItem => product.categoryId === categoryItem.id,
   ); // find by product.categoryId
-  const user = usersFromServer.find(user => category.ownerId === user.id); // find by category.ownerId
+  const user = usersFromServer.find(
+    userItem => category.ownerId === userItem.id,
+  ); // find by category.ownerId
+
   return { ...product, category, user };
 });
 
 export const App = () => {
   const [query, setQuery] = useState('');
+  let visibleProducts = [...products];
+
+  if (query) {
+    visibleProducts = visibleProducts.filter(product => {
+      const normilizedQuery = query.toLowerCase().trim();
+      return product.name.toLowerCase().includes(normilizedQuery);
+    });
+  }
 
   return (
     <div className="section">
@@ -65,6 +76,7 @@ export const App = () => {
                     data-cy="ClearButton"
                     type="button"
                     className="delete"
+                    onClick={() => setQuery('')}
                   />
                 </span>
               </p>
@@ -173,9 +185,9 @@ export const App = () => {
             </thead>
 
             <tbody>
-              {products.map(product => {
+              {visibleProducts.map(product => {
                 return (
-                  <tr data-cy="Product">
+                  <tr data-cy="Product" key={product.id}>
                     <td className="has-text-weight-bold" data-cy="ProductId">
                       {product.id}
                     </td>
