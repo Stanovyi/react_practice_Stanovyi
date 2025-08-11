@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 import React, { useState } from 'react';
 import './App.scss';
+import cn from 'classnames';
 
 import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
@@ -20,8 +21,15 @@ const products = productsFromServer.map(product => {
 export const App = () => {
   const [query, setQuery] = useState('');
   const [categorySelected, setcategorySelected] = useState(0);
+  const [selectedUserId, setSelectedUserId] = useState(0);
 
   let visibleProducts = [...products];
+
+  if (selectedUserId) {
+    visibleProducts = visibleProducts.filter(product => {
+      return product.user.id === selectedUserId;
+    });
+  }
 
   if (categorySelected) {
     visibleProducts = visibleProducts.filter(product => {
@@ -37,6 +45,14 @@ export const App = () => {
     });
   }
 
+  let categoryNames = [];
+  products.forEach(product => {
+    if (!categoryNames.includes(product.categoryId))
+      return categoryNames.push(product.categoryId);
+  });
+
+  console.log(categoryNames);
+
   return (
     <div className="section">
       <div className="container">
@@ -47,21 +63,26 @@ export const App = () => {
             <p className="panel-heading">Filters</p>
 
             <p className="panel-tabs has-text-weight-bold">
-              <a data-cy="FilterAllUsers" href="#/">
+              <a
+                data-cy="FilterAllUsers"
+                href="#/"
+                onClick={() => setSelectedUserId(0)}
+              >
                 All
               </a>
 
-              <a data-cy="FilterUser" href="#/">
-                User 1
-              </a>
-
-              <a data-cy="FilterUser" href="#/" className="is-active">
-                User 2
-              </a>
-
-              <a data-cy="FilterUser" href="#/">
-                User 3
-              </a>
+              {usersFromServer.map(user => {
+                return (
+                  <a
+                    data-cy="FilterUser"
+                    href="#/"
+                    onClick={() => setSelectedUserId(user.id)}
+                    className={cn({ 'is-active': user.id === selectedUserId })}
+                  >
+                    {user.name}
+                  </a>
+                );
+              })}
             </p>
 
             <div className="panel-block">
@@ -101,42 +122,19 @@ export const App = () => {
                 All
               </a>
 
-              {products.map(product => {
-                <a
-                  data-cy="Category"
-                  className="button mr-2 my-1 is-info"
-                  href="#/"
-                  onClick={() => setcategorySelected(product.categoryId)}
-                >
-                  Category {product.categoryId}
-                </a>;
+              {categoryNames.map(categoryName => {
+                return (
+                  <a
+                    key={categoryName}
+                    data-cy="Category"
+                    className="button mr-2 my-1 is-info"
+                    href="#/"
+                    onClick={() => setcategorySelected(categoryName)}
+                  >
+                    Category {categoryName}
+                  </a>
+                );
               })}
-
-              {/* <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-                onClick={() => setcategorySelected(2)}
-              >
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-                onClick={() => setcategorySelected(3)}
-              >
-                Category 3
-              </a>
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-                onClick={() => setcategorySelected(4)}
-              >
-                Category 4
-              </a> */}
             </div>
 
             <div className="panel-block">
